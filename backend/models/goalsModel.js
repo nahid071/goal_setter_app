@@ -7,13 +7,12 @@ const goalSchema = mongoose.Schema(
       required: true,
       ref: "User",
     },
-  },
-  {
     goal: {
       type: String,
       required: [true, "Please add a goal"],
     },
   },
+
   {
     timestamps: true,
   }

@@ -3,7 +3,9 @@ const User = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
 
-// Register new user
+// @desc    Register User
+// @route   POST /api/users/register
+// @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   // Field Validation
   const { name, email, password } = req.body
@@ -37,6 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      token: generateToken(user._id),
     })
   } else {
     res.status(400)
@@ -44,7 +47,9 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 })
 
-// Authenticate user
+// @desc    Authenticate user
+// @route   POST /api/users/login
+// @access  Public
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
@@ -52,13 +57,12 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email })
 
   // Check if password is correct
-  const passwordCheck = await bcrypt.compare(password, user.password)
-
-  if (user && passwordCheck) {
+  if (user && (await bcrypt.compare(password, user.password))) {
     res.json({
       _id: user.id,
       name: user.name,
       email: user.email,
+      token: generateToken(user._id),
     })
   } else {
     res.status(400)
@@ -66,9 +70,24 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 })
 
-// Get User data
+// @desc    Get User data
+// @route   GET /api/users/me
+// @access  Private
 const getMe = asyncHandler(async (req, res) => {
-  res.json({ message: "user data display" })
+  const { _id, name, email } = await User.findById(req.user.id)
+
+  res.status(200).json({
+    id: _id,
+    name,
+    email,
+  })
 })
+
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  })
+}
 
 module.exports = { registerUser, loginUser, getMe }
