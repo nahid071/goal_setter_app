@@ -40,6 +40,8 @@ const Login = () => {
               placeholder="Enter your email"
               onChange={onChange}
             />
+          </div>
+          <div className="form-group">
             <input
               type="password"
               className="form-control"
