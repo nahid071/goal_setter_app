@@ -10,6 +10,7 @@ const Dashboard = () => {
   const dispatch = useDispatch()
 
   const { user } = useSelector((state) => state.auth)
+
   const { goals, isLoading, isError, message } = useSelector(
     (state) => state.goals
   )
@@ -18,6 +19,7 @@ const Dashboard = () => {
     if (isError) {
       console.log(message)
     }
+
     if (!user) {
       navigate("/login")
     }
@@ -27,7 +29,7 @@ const Dashboard = () => {
     return () => {
       dispatch(reset())
     }
-  }, [user, navigate, isError, message, dispatch])
+  }, [user, navigate])
 
   if (isLoading) {
     return <Spinner />
